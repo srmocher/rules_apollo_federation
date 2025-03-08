@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "supergraph_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/srmocher/rules_apollo_federation/federation/private/supergraph",
+    visibility = ["//visibility:private"],
+    deps = ["@in_gopkg_yaml_v3//:go_default_library"],
+)
+
+go_binary(
+    name = "supergraph",
+    embed = [":supergraph_lib"],
+    visibility = ["//visibility:public"],
+)

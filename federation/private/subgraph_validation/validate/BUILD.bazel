@@ -1,0 +1,22 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "validate_lib",
+    srcs = [
+        "main.go",
+        "utils.go",
+    ],
+    importpath = "github.com/srmocher/rules_apollo_federation/federation/private/subgraph_validation/validate",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_otiai10_copy//:go_default_library",
+        "@in_gopkg_yaml_v3//:go_default_library",
+        "@rules_go//go/runfiles:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "validate",
+    embed = [":validate_lib"],
+    visibility = ["//visibility:public"],
+)
