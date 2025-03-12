@@ -1,0 +1,23 @@
+schema {
+  query: Query
+}
+
+type Query {
+  engineers: [Engineer!]!
+  engineer(id: ID!): Engineer
+}
+
+type Engineer @key(fields: "id") {
+  id: ID!
+  name: String!
+  email: String!
+  title: String!
+  team: String!
+  repositories: [Repository!]! @provides(fields: "name") @external
+}
+
+type Repository @key(fields: "id") @extends {
+  id: ID! @external
+  name: String! @external
+  contributors: [Engineer!]! @requires(fields: "name")
+}

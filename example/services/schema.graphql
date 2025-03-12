@@ -1,0 +1,38 @@
+schema {
+  query: Query
+}
+
+type Query {
+  services: [Service!]!
+  service(id: ID!): Service
+}
+
+type Service @key(fields: "id") {
+  id: ID!
+  name: String!
+  description: String
+  url: String!
+  status: ServiceStatus!
+  version: String!
+  deployedAt: String!
+  repository: Repository! @external
+  maintainers: [Engineer!]! @provides(fields: "name") @external
+}
+
+enum ServiceStatus {
+  ONLINE
+  DEGRADED
+  OFFLINE
+  MAINTENANCE
+}
+
+type Repository @key(fields: "id") @extends {
+  id: ID! @external
+  services: [Service!]!
+}
+
+type Engineer @key(fields: "id") @extends {
+  id: ID! @external
+  name: String! @external
+  maintainedServices: [Service!]!
+}

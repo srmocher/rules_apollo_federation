@@ -25,12 +25,12 @@ def _subgraph_args_and_inputs(ctx, use_short_path = True):
         if ApolloSubgraphSchema not in schema_file_target:
             fail("Not a valid dgs schema target: {}".format(schema_file_target))
 
-        schema_file = schema_file_target[ApolloSubgraphSchema].schema_file
-        service_name = schema_file_target[ApolloSubgraphSchema].service_name
+        schema_file = schema_file_target[ApolloSubgraphSchema].schema
+        subgraph_name = schema_file_target[ApolloSubgraphSchema].subgraph_name
         schema_path = schema_file.path
         if use_short_path:
             schema_path = schema_file.short_path
-        subgraph_args.append("{}={}".format(service_name, schema_path))
+        subgraph_args.append("{}={}".format(subgraph_name, schema_path))
         inputs.append(schema_file)
 
     return subgraph_args, inputs
@@ -38,14 +38,14 @@ def _subgraph_args_and_inputs(ctx, use_short_path = True):
 def _validate_subgraph_schemas(ctx):
     services = {}
     for schema_target in ctx.attr.subgraph_schemas:
-        if schema_target[ApolloSubgraphSchema].service_name in services:
+        if schema_target[ApolloSubgraphSchema].subgraph_name in services:
             fail("Multiple subgraph schemas declared for {}: {}, {}. Make sure only one is declared so that composition can happen".format(
-                schema_target[ApolloSubgraphSchema].service_name,
+                schema_target[ApolloSubgraphSchema].subgraph_name,
                 schema_target,
                 services[schema_target[ApolloSubgraphSchema].service_name],
             ))
         else:
-            services[schema_target[ApolloSubgraphSchema].service_name] = schema_target
+            services[schema_target[ApolloSubgraphSchema].subgraph_name] = schema_target
 
 def _tar_schema_and_config_files(ctx, rover_config_file):
     tar_file = ctx.actions.declare_file("{}_subgraph_schemas.tar.gz".format(ctx.attr.tenant))
@@ -71,12 +71,12 @@ def _apollo_supergraph_implementation(ctx):
     supergraph_sdl = ctx.actions.declare_file("{}_supergraph.graphql".format(ctx.attr.tenant))
     _validate_subgraph_schemas(ctx)
     rover_config_file = _rover_config_compose(ctx)
-    subgraphs_tar = _tar_schema_and_config_files(ctx, rover_config_file, transformed_schemas)
+    subgraphs_tar = _tar_schema_and_config_files(ctx, rover_config_file)
 
     inputs = []
     inputs.append(rover_config_file)
     for schema_target in ctx.attr.subgraph_schemas:
-        inputs.append(schema_target[ApolloSubgraphSchema].schema_file)
+        inputs.append(schema_target[ApolloSubgraphSchema].schema)
 
     ctx.actions.run(
         executable = ctx.executable._rover,
@@ -118,7 +118,7 @@ apollo_supergraph = rule(
             doc = "A list of subgraph schema targets that are required for composition.",
         ),
         "_supergraph_setup_tool": attr.label(
-            default = Label("//federation/private/supergraph_setup"),
+            default = Label("//federation/private/supergraph"),
             executable = True,
             cfg = "exec",
         ),

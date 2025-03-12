@@ -1,0 +1,9 @@
+module(
+    name = "example",
+)
+
+bazel_dep(name = "rules_apollo_federation")
+local_path_override(
+    module_name = "rules_apollo_federation",
+    path = "../",
+)

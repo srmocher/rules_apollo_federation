@@ -1,3 +1,7 @@
+module(
+    name = "rules_apollo_federation",
+)
+
 bazel_dep(name = "rules_go", version = "0.39.1")
 bazel_dep(name = "gazelle", version = "0.31.0")
 
@@ -5,6 +9,31 @@ go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
 use_repo(
     go_deps,
-    "in_gopkg_yaml_v3",
     "com_github_otiai10_copy",
+    "in_gopkg_yaml_v3",
+)
+
+bazel_dep(name = "platforms", version = "0.0.11")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "apollo_rover_darwin_arm64",
+    sha256 = "4e6e606a051012aefb2c72aeddfba296ecb938e2e92609eb8ad9b10e3bc8f102",
+    urls = ["https://github.com/apollographql/rover/releases/download/v0.26.1/rover-v0.26.1-aarch64-apple-darwin.tar.gz"],
+    build_file_content = "exports_files([\"dist/rover\"])"
+)
+
+http_archive(
+    name = "apollo_rover_darwin_amd64",
+    sha256 = "771ae1e93b42c468f6cfb6a71c2bc6842c7290fe02231cf25eafee2bc2d479fb",
+    urls = ["https://github.com/apollographql/rover/releases/download/v0.26.1/rover-v0.26.1-x86_64-apple-darwin.tar.gz"],
+    build_file_content = "exports_files([\"dist/rover\"])"
+)
+
+http_archive(
+    name = "apollo_rover_linux_amd64",
+    sha256 = "c22aa1c14066ccd98433f1be22ad9a8da8f3a3a9be5fd6b8be101cf1aa8434ba",
+    urls = ["https://github.com/apollographql/rover/releases/download/v0.26.1/rover-v0.26.1-x86_64-unknown-linux-gnu.tar.gz"],
+    build_file_content = "exports_files([\"dist/rover\"])"
 )

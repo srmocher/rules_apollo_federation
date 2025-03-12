@@ -1,0 +1,33 @@
+schema {
+  query: Query
+}
+
+type Query {
+  repositories: [Repository!]!
+  repository(id: ID!): Repository
+}
+
+type Repository @key(fields: "id") {
+  id: ID!
+  name: String!
+  description: String
+  url: String!
+  primaryLanguage: String
+  createdAt: String!
+  updatedAt: String!
+  owner: Engineer! @provides(fields: "name") @external
+  contributors: [Engineer!]! @external
+  services: [Service!]! @provides(fields: "name") @external
+}
+
+type Engineer @key(fields: "id") @extends {
+  id: ID! @external
+  name: String! @external
+  repositories: [Repository!]!
+}
+
+type Service @key(fields: "id") @extends {
+  id: ID! @external
+  name: String! @external
+  repository: Repository!
+}

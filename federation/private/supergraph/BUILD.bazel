@@ -13,3 +13,13 @@ go_binary(
     embed = [":supergraph_lib"],
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "rover",
+    actual = select({
+        "//federation/private/platforms:linux_amd64": "@apollo_rover_linux_amd64//:dist/rover",
+        "//federation/private/platforms:macos_amd64": "@apollo_rover_darwin_amd64//:dist/rover",
+        "//federation/private/platforms:macos_arm64": "@apollo_rover_darwin_arm64//:dist/rover",
+    }),
+    visibility = ["//visibility:public"],
+)
